@@ -2,34 +2,34 @@ import React from 'react';
 import { Clock, Calendar, User, ArrowLeft, Share2, Bookmark, ThumbsUp, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ArticleDetail({ params }: { params: { slug: string } }) {
-    // Mock data based on slug (in a real app, fetch data here)
-    const article = {
-        title: decodeURIComponent(params.slug).replace(/-/g, ' '),
-        author: "Minh Tuấn",
-        date: "12/05/2024",
-        readTime: "5 phút đọc",
-        category: "Lập trình",
-        content: `
-            <p class="mb-4">JavaScript là một ngôn ngữ lập trình mạnh mẽ, nhưng việc tối ưu hóa hiệu năng của nó không phải lúc nào cũng dễ dàng. Trong bài viết này, chúng ta sẽ đi sâu vào các kỹ thuật nâng cao để cải thiện tốc độ và hiệu quả của ứng dụng JavaScript.</p>
-            
-            <h2 class="text-2xl font-bold mt-8 mb-4 text-slate-900">1. Hiểu về V8 Engine</h2>
-            <p class="mb-4">V8 là engine JavaScript mã nguồn mở của Google, được sử dụng trong Chrome và Node.js. Để viết code tối ưu cho V8, bạn cần hiểu cách nó hoạt động, bao gồm Hidden Classes và Inline Caching.</p>
-            
-            <h2 class="text-2xl font-bold mt-8 mb-4 text-slate-900">2. Quản lý bộ nhớ và Memory Leaks</h2>
-            <p class="mb-4">Memory leaks có thể làm chậm ứng dụng của bạn theo thời gian. Các nguyên nhân phổ biến bao gồm biến toàn cục không mong muốn, closures, và các event listeners không được gỡ bỏ.</p>
-            
-            <h2 class="text-2xl font-bold mt-8 mb-4 text-slate-900">3. Sử dụng Web Workers</h2>
-            <p class="mb-4">JavaScript là đơn luồng, nhưng Web Workers cho phép bạn chạy các tác vụ nặng ở background thread, giúp giao diện người dùng không bị đơ.</p>
-            
-            <blockquote class="border-l-4 border-brand-500 pl-4 italic my-6 text-slate-600 bg-slate-50 p-4 rounded-r-lg">
-                "Tối ưu hóa sớm là nguồn gốc của mọi tội lỗi." - Donald Knuth
-            </blockquote>
-            
-            <p class="mb-4">Tuy nhiên, điều này không có nghĩa là chúng ta nên bỏ qua hiệu năng. Hãy đo lường trước khi tối ưu hóa.</p>
-        `,
-        image: "https://placehold.co/800x400/f3e8ff/6d28d9?text=Article+Cover"
-    };
+import { notFound } from 'next/navigation';
+
+export default async function ArticleDetail({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+
+    let article;
+    try {
+        const res = await fetch(`http://localhost:8000/api/articles/${slug}/`, { cache: 'no-store' });
+
+        if (!res.ok) {
+            notFound();
+        }
+
+        const data = await res.json();
+        article = {
+            title: data.title,
+            author: data.author,
+            date: new Date(data.created_at).toLocaleDateString('vi-VN'),
+            readTime: data.readTime,
+            category: data.category,
+            content: data.content,
+            image: data.image || "https://placehold.co/800x400/f3e8ff/6d28d9?text=Article+Cover",
+            tags: data.tags || []
+        };
+    } catch (error) {
+        console.error("Error fetching article:", error);
+        notFound();
+    }
 
     return (
         <div className="bg-slate-50 min-h-screen pb-20">
@@ -91,9 +91,15 @@ export default function ArticleDetail({ params }: { params: { slug: string } }) 
                     <div className="mt-10 pt-6 border-t border-slate-100">
                         <h3 className="text-sm font-bold text-slate-900 mb-3">Tags:</h3>
                         <div className="flex flex-wrap gap-2">
-                            <Link href="#" className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm hover:bg-brand-100 hover:text-brand-700 transition">#javascript</Link>
-                            <Link href="#" className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm hover:bg-brand-100 hover:text-brand-700 transition">#performance</Link>
-                            <Link href="#" className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm hover:bg-brand-100 hover:text-brand-700 transition">#webdev</Link>
+                            {article.tags && article.tags.length > 0 ? (
+                                article.tags.map((tag: any) => (
+                                    <Link key={tag.id} href="#" className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm hover:bg-brand-100 hover:text-brand-700 transition">
+                                        #{tag.name}
+                                    </Link>
+                                ))
+                            ) : (
+                                <span className="text-slate-500 italic">No tags</span>
+                            )}
                         </div>
                     </div>
                 </div>

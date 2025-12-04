@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Sparkles, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,6 +9,30 @@ export default function NewsList() {
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
+    const [news, setNews] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/articles/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const mappedNews = data.map((article: any) => ({
+                        type: article.category || 'General',
+                        title: article.title,
+                        time: new Date(article.created_at).toLocaleDateString('vi-VN'), // Simple formatting
+                        slug: article.slug
+                    }));
+                    console.log("Fetched news:", mappedNews);
+                    setNews(mappedNews);
+                }
+            } catch (error) {
+                console.error("Failed to fetch news:", error);
+            }
+        };
+
+        fetchNews();
+    }, []);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!scrollRef.current) return;
@@ -33,12 +57,9 @@ export default function NewsList() {
         scrollRef.current.scrollLeft = scrollLeft - walk;
     };
 
-    const news = [
-        { type: "News", title: "React 19 Beta: Những tính năng đáng mong đợi nhất", time: "2 giờ trước" },
-        { type: "Tutorial", title: "Hướng dẫn bảo mật API với JWT và Refresh Token", time: "4 giờ trước" },
-        { type: "Resource", title: "Bộ UI Kit miễn phí cho dự án E-commerce 2024", time: "6 giờ trước" },
-        { type: "Event", title: "Web Summit 2024: Tổng hợp các bài talk hay nhất", time: "1 ngày trước" },
-    ];
+    if (news.length === 0) {
+        return null;
+    }
 
     return (
         <div className="mb-10 reveal active reveal-delay-200">
@@ -63,7 +84,7 @@ export default function NewsList() {
                 {news.map((item, index) => (
                     <Link
                         key={index}
-                        href={`/articles/${encodeURIComponent(item.title.replace(/\s+/g, '-'))}`}
+                        href={`/articles/${item.slug}`}
                         className="min-w-[280px] md:min-w-[320px] bg-white p-4 rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition group snap-center pointer-events-none md:pointer-events-auto"
                         onClick={(e) => { if (isDragging) e.preventDefault(); }}
                     >

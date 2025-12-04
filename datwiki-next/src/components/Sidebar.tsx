@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     PanelLeftClose, PanelLeftOpen, Home, Compass, Bookmark, Users,
     TrendingUp, Sparkles, ArrowUpRight, Tag, Zap
@@ -9,6 +9,47 @@ import Link from 'next/link';
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [topics, setTopics] = useState<any[]>([]);
+    const [tags, setTags] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [topicsRes, tagsRes] = await Promise.all([
+                    fetch('http://localhost:8000/api/topics/'),
+                    fetch('http://localhost:8000/api/tags/')
+                ]);
+
+                if (topicsRes.ok) {
+                    const topicsData = await topicsRes.json();
+                    setTopics(topicsData);
+                }
+
+                if (tagsRes.ok) {
+                    const tagsData = await tagsRes.json();
+                    setTags(tagsData);
+                }
+            } catch (error) {
+                console.error("Failed to fetch sidebar data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const getColorClass = (color: string) => {
+        const map: Record<string, string> = {
+            blue: "bg-blue-500",
+            green: "bg-green-500",
+            purple: "bg-purple-500",
+            orange: "bg-orange-500",
+            pink: "bg-pink-500",
+            red: "bg-red-500",
+            yellow: "bg-yellow-500",
+            teal: "bg-teal-500",
+        };
+        return map[color] || "bg-slate-500";
+    };
 
     return (
         <aside
@@ -35,7 +76,7 @@ export default function Sidebar() {
                             <Home className={`sidebar-icon mr-3 h-5 w-5 text-brand-600 flex-shrink-0 ${isCollapsed ? 'mr-0' : ''}`} />
                             <span className={`sidebar-text whitespace-nowrap ${isCollapsed ? 'hidden' : ''}`}>Trang chủ</span>
                         </Link>
-                        <Link href="#" className="sidebar-link group flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-700 rounded-lg transition-colors">
+                        <Link href="/discover" className="sidebar-link group flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-700 rounded-lg transition-colors">
                             <Compass className={`sidebar-icon mr-3 h-5 w-5 text-slate-400 group-hover:text-brand-600 transition-colors flex-shrink-0 ${isCollapsed ? 'mr-0' : ''}`} />
                             <span className={`sidebar-text whitespace-nowrap ${isCollapsed ? 'hidden' : ''}`}>Khám phá</span>
                         </Link>
@@ -57,27 +98,15 @@ export default function Sidebar() {
                     <div>
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">Chủ đề</h3>
                         <nav className="space-y-1">
-                            <Link href="#" className="group flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-700 rounded-lg transition-colors">
-                                <div className="flex items-center">
-                                    <span className="w-2 h-2 rounded-full bg-blue-500 mr-3"></span>
-                                    <span className="whitespace-nowrap">Kỹ thuật phần mềm</span>
-                                </div>
-                                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full group-hover:bg-brand-100 group-hover:text-brand-700">120</span>
-                            </Link>
-                            <Link href="#" className="group flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-700 rounded-lg transition-colors">
-                                <div className="flex items-center">
-                                    <span className="w-2 h-2 rounded-full bg-green-500 mr-3"></span>
-                                    <span className="whitespace-nowrap">Thiết kế UI/UX</span>
-                                </div>
-                                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full group-hover:bg-brand-100 group-hover:text-brand-700">45</span>
-                            </Link>
-                            <Link href="#" className="group flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-700 rounded-lg transition-colors">
-                                <div className="flex items-center">
-                                    <span className="w-2 h-2 rounded-full bg-purple-500 mr-3"></span>
-                                    <span className="whitespace-nowrap">Quản trị mạng</span>
-                                </div>
-                                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full group-hover:bg-brand-100 group-hover:text-brand-700">32</span>
-                            </Link>
+                            {topics.map((topic) => (
+                                <Link key={topic.id} href="#" className="group flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-700 rounded-lg transition-colors">
+                                    <div className="flex items-center">
+                                        <span className={`w-2 h-2 rounded-full mr-3 ${getColorClass(topic.color)}`}></span>
+                                        <span className="whitespace-nowrap">{topic.name}</span>
+                                    </div>
+                                    <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full group-hover:bg-brand-100 group-hover:text-brand-700">0</span>
+                                </Link>
+                            ))}
                         </nav>
                     </div>
 
@@ -127,10 +156,11 @@ export default function Sidebar() {
                             Tags phổ biến
                         </h3>
                         <div className="flex flex-wrap gap-2 px-2">
-                            <Link href="#" className="px-2.5 py-1 bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-700 text-slate-600 rounded-md text-xs font-medium transition">#javascript</Link>
-                            <Link href="#" className="px-2.5 py-1 bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-700 text-slate-600 rounded-md text-xs font-medium transition">#css</Link>
-                            <Link href="#" className="px-2.5 py-1 bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-700 text-slate-600 rounded-md text-xs font-medium transition">#system-design</Link>
-                            <Link href="#" className="px-2.5 py-1 bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-700 text-slate-600 rounded-md text-xs font-medium transition">#security</Link>
+                            {tags.map((tag) => (
+                                <Link key={tag.id} href="#" className="px-2.5 py-1 bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-700 text-slate-600 rounded-md text-xs font-medium transition">
+                                    #{tag.name}
+                                </Link>
+                            ))}
                         </div>
                     </div>
 

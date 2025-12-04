@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef, useState } from 'react';
-import { LayoutGrid, ChevronRight, Code2, PenTool, Database, LineChart, Video } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { LayoutGrid, ChevronRight } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import Link from 'next/link';
 
 export default function CategoryList() {
@@ -9,6 +10,35 @@ export default function CategoryList() {
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
+    const [categories, setCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/topics/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const mappedCategories = data.map((topic: any) => {
+                        // Dynamically get the icon component
+                        // @ts-ignore
+                        const IconComponent = Icons[topic.icon] || Icons.Code2;
+
+                        return {
+                            icon: IconComponent,
+                            label: topic.name,
+                            color: topic.color || 'blue',
+                            id: topic.id
+                        };
+                    });
+                    setCategories(mappedCategories);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!scrollRef.current) return;
@@ -33,14 +63,6 @@ export default function CategoryList() {
         scrollRef.current.scrollLeft = scrollLeft - walk;
     };
 
-    const categories = [
-        { icon: Code2, label: "Lập trình", color: "blue" },
-        { icon: PenTool, label: "Thiết kế", color: "purple" },
-        { icon: Database, label: "Dữ liệu", color: "green" },
-        { icon: LineChart, label: "Marketing", color: "orange" },
-        { icon: Video, label: "Media", color: "pink" },
-    ];
-
     const getColorClasses = (color: string) => {
         const map: Record<string, string> = {
             blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-600",
@@ -51,6 +73,10 @@ export default function CategoryList() {
         };
         return map[color] || map.blue;
     };
+
+    if (categories.length === 0) {
+        return null;
+    }
 
     return (
         <div className="mb-10 reveal active reveal-delay-100">
@@ -76,7 +102,7 @@ export default function CategoryList() {
             >
                 {categories.map((cat, index) => (
                     <Link
-                        key={index}
+                        key={cat.id}
                         href="#"
                         className="min-w-[160px] md:min-w-[180px] flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:shadow-md hover:shadow-brand-100 transition group snap-center pointer-events-none md:pointer-events-auto"
                         onClick={(e) => { if (isDragging) e.preventDefault(); }}

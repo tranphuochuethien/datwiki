@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
-        fields = ['id', 'name', 'slug', 'description', 'color']
+        fields = ['id', 'name', 'slug', 'description', 'color', 'icon']
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +24,13 @@ class ArticleSerializer(serializers.ModelSerializer):
     readTime = serializers.CharField(source='read_time') # Match frontend camelCase
     tags = TagSerializer(many=True, read_only=True)
     comments = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
+    def get_image(self, obj):
+        if obj.image_upload:
+            return obj.image_upload.url
+        return obj.image
+    
     def get_comments(self, obj):
         return 0 # Placeholder
 
