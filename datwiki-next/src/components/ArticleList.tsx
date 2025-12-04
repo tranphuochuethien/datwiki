@@ -1,54 +1,10 @@
 import React from 'react';
 import { Clock, ThumbsUp, MessageSquare, Share2 } from 'lucide-react';
 import Link from 'next/link';
+import { getArticles } from '@/lib/api';
 
-export default function ArticleList() {
-    const articles = [
-        {
-            category: "Lập trình",
-            categoryColor: "text-brand-700",
-            readTime: "5 phút đọc",
-            title: "Tối ưu hóa hiệu năng JavaScript: Deep Dive",
-            excerpt: "Khám phá các kỹ thuật nâng cao như V8 engine optimization, memory leaks handling và cách viết code JS hiệu quả hơn.",
-            author: "Minh Tuấn",
-            likes: 45,
-            comments: 12,
-            image: "https://placehold.co/160x120/f3e8ff/6d28d9?text=JS+Core"
-        },
-        {
-            category: "Thiết kế",
-            categoryColor: "text-purple-600",
-            readTime: "8 phút đọc",
-            title: "Xu hướng UI Glassmorphism: Có còn hot năm 2024?",
-            excerpt: "Phân tích sự phát triển của phong cách thiết kế kính mờ và cách áp dụng nó một cách tinh tế vào sản phẩm thực tế.",
-            author: "Lan Anh",
-            likes: 128,
-            comments: 34,
-            image: "https://placehold.co/160x120/ede9fe/7c3aed?text=UI+Trend"
-        },
-        {
-            category: "Backend",
-            categoryColor: "text-green-600",
-            readTime: "12 phút đọc",
-            title: "Microservices vs Monolith: Khi nào nên chuyển đổi?",
-            excerpt: "Đừng chạy theo xu hướng mù quáng. Bài viết phân tích chi phí, lợi ích và những thách thức thực tế khi chia nhỏ hệ thống.",
-            author: "Đức Thắng",
-            likes: 89,
-            comments: 21,
-            image: "https://placehold.co/160x120/dcfce7/166534?text=Microservices"
-        },
-        {
-            category: "Marketing",
-            categoryColor: "text-orange-600",
-            readTime: "6 phút đọc",
-            title: "Tâm lý học màu sắc trong Branding năm 2024",
-            excerpt: "Màu tím không chỉ là sự sang trọng. Tìm hiểu cách các thương hiệu lớn sử dụng màu sắc để điều hướng cảm xúc khách hàng.",
-            author: "Hải Yến",
-            likes: 56,
-            comments: 8,
-            image: "https://placehold.co/160x120/ffedd5/c2410c?text=Color+Psych"
-        }
-    ];
+export default async function ArticleList() {
+    const articles = await getArticles();
 
     return (
         <div>
@@ -70,7 +26,7 @@ export default function ArticleList() {
                                 <span className="text-xs text-slate-500 flex items-center"><Clock className="w-3 h-3 mr-1" /> {article.readTime}</span>
                             </div>
                             <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-brand-700 transition">
-                                <Link href={`/articles/${encodeURIComponent(article.title.replace(/\s+/g, '-'))}`}>{article.title}</Link>
+                                <Link href={`/articles/${article.slug}`}>{article.title}</Link>
                             </h3>
                             <p className="text-slate-600 text-sm line-clamp-2 mb-4">
                                 {article.excerpt}
