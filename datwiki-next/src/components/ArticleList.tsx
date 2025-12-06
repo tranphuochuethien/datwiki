@@ -17,7 +17,11 @@ export default async function ArticleList() {
                 {articles.map((article, index) => (
                     <article key={index} className="bg-white p-6 rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition flex flex-col sm:flex-row gap-6 group reveal active">
                         <div className="flex-shrink-0 relative overflow-hidden rounded-lg">
-                            <img src={article.image} alt="Thumbnail" className="w-full sm:w-40 h-32 object-cover transform group-hover:scale-105 transition duration-500" />
+                            <img
+                                src={article.image || "https://placehold.co/800x400/f3e8ff/6d28d9?text=Article+Cover"}
+                                alt="Thumbnail"
+                                className="w-full sm:w-40 h-32 object-cover transform group-hover:scale-105 transition duration-500"
+                            />
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
                             <div className="flex items-center gap-2 mb-2">

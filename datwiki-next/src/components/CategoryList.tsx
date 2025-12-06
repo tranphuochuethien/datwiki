@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { LayoutGrid, ChevronRight } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import Link from 'next/link';
+import { API_URL } from '@/lib/api';
 
 export default function CategoryList() {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -15,7 +16,7 @@ export default function CategoryList() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/topics/');
+                const response = await fetch(`${API_URL}/topics/`);
                 if (response.ok) {
                     const data = await response.json();
                     const mappedCategories = data.map((topic: any) => {

@@ -1,21 +1,22 @@
 import React from 'react';
 import Link from 'next/link';
 import { Compass, Tag, Hash, BookOpen } from 'lucide-react';
+import { API_URL } from '@/lib/api';
 
 async function getTopics() {
-    const res = await fetch('http://localhost:8000/api/topics/', { cache: 'no-store' });
+    const res = await fetch(`${API_URL}/topics/`, { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
 }
 
 async function getTags() {
-    const res = await fetch('http://localhost:8000/api/tags/', { cache: 'no-store' });
+    const res = await fetch(`${API_URL}/tags/`, { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
 }
 
 async function getArticles() {
-    const res = await fetch('http://localhost:8000/api/articles/', { cache: 'no-store' });
+    const res = await fetch(`${API_URL}/articles/`, { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
 }

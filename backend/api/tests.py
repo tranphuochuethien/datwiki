@@ -23,3 +23,18 @@ class ArticleApiTests(TestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['title'], 'Test Article')
         self.assertEqual(response.data[0]['category'], 'Test Topic')
+
+    def test_create_article(self):
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'title': 'New Article',
+            'excerpt': 'New Excerpt',
+            'content': 'New Content',
+            'category_id': self.topic.id,
+            'readTime': '3 min read'
+        }
+        response = self.client.post('/api/articles/', data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Article.objects.count(), 2)
+        self.assertEqual(Article.objects.last().title, 'New Article')
+        self.assertEqual(Article.objects.last().author, self.user)

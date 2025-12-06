@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, Calendar, User, ArrowLeft, Share2, Bookmark, ThumbsUp, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { API_URL } from '@/lib/api';
 
 import { notFound } from 'next/navigation';
 
@@ -9,7 +10,7 @@ export default async function ArticleDetail({ params }: { params: Promise<{ slug
 
     let article;
     try {
-        const res = await fetch(`http://localhost:8000/api/articles/${slug}/`, { cache: 'no-store' });
+        const res = await fetch(`${API_URL}/articles/${slug}/`, { cache: 'no-store' });
 
         if (!res.ok) {
             notFound();

@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Sparkles, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { API_URL } from '@/lib/api';
 
 export default function NewsList() {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -14,7 +15,7 @@ export default function NewsList() {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/articles/');
+                const response = await fetch(`${API_URL}/articles/`);
                 if (response.ok) {
                     const data = await response.json();
                     const mappedNews = data.map((article: any) => ({

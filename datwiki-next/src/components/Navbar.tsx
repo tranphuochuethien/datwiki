@@ -58,9 +58,9 @@ export default function Navbar() {
                         </button>
                         <div className="hidden sm:flex items-center gap-3 border-l pl-4 border-slate-200">
                             <button className="text-sm font-medium text-slate-600 hover:text-brand-700">Đăng nhập</button>
-                            <button className="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 transition shadow-md shadow-brand-700/30">
+                            <Link href="/articles/create" className="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 transition shadow-md shadow-brand-700/30">
                                 Tạo bài viết
-                            </button>
+                            </Link>
                         </div>
                         <button className="lg:hidden p-2 text-slate-500"><Search size={24} /></button>
                     </div>

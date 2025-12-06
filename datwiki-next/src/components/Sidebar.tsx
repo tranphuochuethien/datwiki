@@ -6,6 +6,7 @@ import {
     TrendingUp, Sparkles, ArrowUpRight, Tag, Zap
 } from 'lucide-react';
 import Link from 'next/link';
+import { API_URL } from '@/lib/api';
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -16,8 +17,8 @@ export default function Sidebar() {
         const fetchData = async () => {
             try {
                 const [topicsRes, tagsRes] = await Promise.all([
-                    fetch('http://localhost:8000/api/topics/'),
-                    fetch('http://localhost:8000/api/tags/')
+                    fetch(`${API_URL}/topics/`),
+                    fetch(`${API_URL}/tags/`)
                 ]);
 
                 if (topicsRes.ok) {
